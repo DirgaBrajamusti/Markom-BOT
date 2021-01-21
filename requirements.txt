@@ -1,0 +1,16 @@
+requests
+mysql-connector-python
+flask
+datetime
+beautifulsoup4
+staticmap
+ffmpy
+pytesseract
+APScheduler
+pandas
+xlrd
+openpyxl
+docxtpl
+docx2pdf
+PyPDF2
+reportlab
