@@ -10,7 +10,6 @@ APScheduler
 pandas
 xlrd
 openpyxl
-docxtpl
-docx2pdf
+redis
 PyPDF2
 reportlab

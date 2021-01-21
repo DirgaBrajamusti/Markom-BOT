@@ -12,6 +12,7 @@ print("System online: " + str(datetime.datetime.now()))
 # Config
 from config.database import *
 from config.message import *
+from config.redisdata import *
 
 # Commands
 import commands.pmb as pmb

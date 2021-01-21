@@ -8,13 +8,13 @@ var express = require('express');
 var app = express();
 var mime = require('mime-types')
 var redis = require('redis'),
-redis = redis.createClient();
+rd = redis.createClient();
 
 // Redis Connection
-redis.on('error', function(err){
+rd.on('error', function(err){
     console.log('Error ' + err);
 });
-redis.on('ready', function(){
+rd.on('ready', function(){
     console.log('// Redis Ready');
 });
 
@@ -82,17 +82,13 @@ var terkirim = [];
 client.on('message_ack', (message, ack)=>{
     if(ack == 1){
         console.log(message.id._serialized +": Server Send");
-        terkirim.push({
-            message_id: message.id._serialized,
-            status: "pending"
-        });
+        rd.set("msg:"+ message.to.slice(0, -5), "pending");
     }else if(ack == 2){
         console.log(message.id._serialized +": Message Received");
-        console.log(terkirim["status"])
-        terkirim.push({
-            message_id: message.id._serialized,
-            status: "delivered"
-        });
+        rd.set("msg:"+message.to.slice(0, -5), "delivered");
+    }else if(ack == 3){
+        console.log(message.id._serialized +": Message Readed");
+        rd.set("msg:"+message.to.slice(0, -5), "read");
     }
 });
 

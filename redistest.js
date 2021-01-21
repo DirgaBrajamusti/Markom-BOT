@@ -1,10 +1,13 @@
 var redis = require('redis'),
-client = redis.createClient();
+rd = redis.createClient();
 
-client.on('error', function(err){
+rd.on('error', function(err){
     console.log('Error ' + err);
 });
 
 
 console.log('Connection is establishing now...');
-client.get("user:123", redis.print);
+rd.get("user:123", redis.print);
+for(i=0; i < 10; i++){
+    rd.set("test:"+i, "Hello")
+}
