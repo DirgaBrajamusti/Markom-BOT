@@ -5,6 +5,8 @@
 
  - Install node package 
  - Install python dependencies 
+ - Install Redis
+ - Install MySQL/MariaDB
 
 ## Usage
  - Run the whatsapp-web.js using `node app.js`

@@ -82,13 +82,13 @@ var terkirim = [];
 client.on('message_ack', (message, ack)=>{
     if(ack == 1){
         console.log(message.id._serialized +": Server Send");
-        rd.set("msg:"+ message.to.slice(0, -5), "pending");
+        rd.set("msg:"+ message.to.slice(0, -5), "Pending");
     }else if(ack == 2){
         console.log(message.id._serialized +": Message Received");
-        rd.set("msg:"+message.to.slice(0, -5), "delivered");
+        rd.set("msg:"+message.to.slice(0, -5), "Terkirim");
     }else if(ack == 3){
         console.log(message.id._serialized +": Message Readed");
-        rd.set("msg:"+message.to.slice(0, -5), "read");
+        rd.set("msg:"+message.to.slice(0, -5), "Sudah Dibaca");
     }
 });
 

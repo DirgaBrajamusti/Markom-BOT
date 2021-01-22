@@ -55,6 +55,31 @@ def lihatDataPMB():
         dbCursor.close()
         return hasil
 
+def updateStatusPesan(nomor_telepon, status):
+    dbCursor = db.cursor(dictionary=True)
+    sql = f"UPDATE pmb SET status='{status}' WHERE  nomor_telepon='{nomor_telepon}'"
+    dbCursor.execute(sql)
+    try:
+        db.commit()
+        dbCursor.close()
+        return True
+    except:
+        return False
+
+def lihatListDataPMB():
+    dbCursor = db.cursor(dictionary=True)
+    dbCursor.execute(f"SELECT * FROM pmb")
+    hasil = dbCursor.fetchall()
+    if not hasil:
+        dbCursor.close()
+        return False
+    else:
+        dbCursor.close()
+        data_semua = []
+        for data in hasil:
+            data_semua.append(list(data.values()))
+        return data_semua
+
 def cariDataPMB(id):
     dbCursor = db.cursor(dictionary=True)
     dbCursor.execute(f"SELECT * FROM pmb WHERE id = {id}")

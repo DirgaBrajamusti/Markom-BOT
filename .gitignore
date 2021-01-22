@@ -105,3 +105,4 @@ dist
 
 # Whatsapp Session
 config/session.json
+assets/

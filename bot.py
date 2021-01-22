@@ -8,6 +8,14 @@ import os
 
 
 print("System online: " + str(datetime.datetime.now()))
+def checkStatusPesan():
+  print("Check Status Pesan")
+  for data in lihatDataPMB():
+    updateStatusPesan(data["nomor_telepon"], getStatusPengiriman(data["nomor_telepon"]))
+
+scheduler = BackgroundScheduler()
+#scheduler.add_job(checkStatusPesan, 'cron', minute='*/10')
+scheduler.start()
 
 # Config
 from config.database import *
@@ -44,6 +52,14 @@ def datapenerima():
                 waKirimSurat(orang["nomor_telepon"], f"Surat Undangan {orang['nama']}.pdf")
         return "Done"
     return render_template('datapenerima.html', data = data)
+@app.route('/test/datapenerima', methods=['GET', 'POST'])
+def testdatapenerima():
+    data = lihatDataPMB()
+    if request.method == 'POST':
+        for pil in request.form.getlist('pilihan'):
+            print(pil)
+        return "Done"
+    return render_template('testdatapenerima.html', datapmb = {'data': lihatListDataPMB()})
 
 @app.route('/api/v1/message', methods=['GET'])
 def api_message_request():

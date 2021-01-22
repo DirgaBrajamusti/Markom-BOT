@@ -14,6 +14,8 @@ def masukinDataPMB(message_from, message_body):
     df = df.replace({np.nan: None})
     inserted_data = 0
     for data in df.values.tolist():
+        if str(data[2]).startswith("0"):
+            data[2] = "62" + str(data[2][1:])
         if insertDataPMB(data[0], data[1], data[2], data[3]):
             inserted_data += 1
     return inserted_data

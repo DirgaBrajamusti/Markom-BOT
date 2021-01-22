@@ -1,6 +1,7 @@
 from flask import jsonify
 import requests
 from config.redisdata import *
+from config.database import *
 
 def sendAttachment(filePath,caption):
   return jsonify({"type": "attachment","data": filePath, "caption" : caption})
