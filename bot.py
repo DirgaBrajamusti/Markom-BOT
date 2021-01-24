@@ -1,10 +1,12 @@
 import flask
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, flash, redirect, url_for
 import requests
 import atexit
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import os
+import uuid
+
 
 
 print("System online: " + str(datetime.datetime.now()))
@@ -14,7 +16,7 @@ def checkStatusPesan():
     updateStatusPesan(data["nomor_telepon"], getStatusPengiriman(data["nomor_telepon"]))
 
 scheduler = BackgroundScheduler()
-#scheduler.add_job(checkStatusPesan, 'cron', minute='*/10')
+#scheduler.add_job(checkStatusPesan, 'cron', minute='*/1')
 scheduler.start()
 
 # Config
@@ -28,22 +30,28 @@ import commands.pmb as pmb
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+app.config['SECRET_KEY'] = "rahasia"
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
-  return render_template('index.html')
-
-@app.route('/uploader', methods = ['GET', 'POST'])
-def upload_file():
-   if request.method == 'POST':
+  if request.method == 'POST':
       f = request.files['file']
-      f.save(f"assets\\userfile\\{f.filename}{f.filename}")
-      pmb.masukinDataPMB(f.filename,f.filename)
-      return 'file uploaded successfully'
+      uid = uuid.uuid4()
+      f.save(f"assets\\userfile\\{uid}{f.filename}")
+      hasil = pmb.masukinDataPMB(uid,f.filename)
+      if not hasil[1]:
+        flash(f"{hasil[0]} telah dimasukkan")
+      else:
+        flash(f"{hasil[0]} telah dimasukkan")
+        flash(f"Tolong cek file ini{hasil[1]}")
+      return redirect(url_for('home'))
+  return render_template('index.html', data = pmb.persenanDataPesan())
 
 @app.route('/datapenerima', methods=['GET', 'POST'])
 def datapenerima():
     data = lihatDataPMB()
+    if not data:
+      data = 0
     if request.method == 'POST':
         for pil in request.form.getlist('pilihan'):
             orang = cariDataPMB(pil)[0]
@@ -52,6 +60,7 @@ def datapenerima():
                 waKirimSurat(orang["nomor_telepon"], f"Surat Undangan {orang['nama']}.pdf")
         return "Done"
     return render_template('datapenerima.html', data = data)
+
 @app.route('/test/datapenerima', methods=['GET', 'POST'])
 def testdatapenerima():
     data = lihatDataPMB()
@@ -70,7 +79,18 @@ def api_message_request():
     attachment = str(request.args['attachment'])
   else:
     return jsonify(message="Please check the message.",category="error",status=404)
-
   return pmb.checkMessage(message_from, message_body.lower(), attachment)
+@app.route('/api/v1/update_pengiriman', methods=['GET'])
+def api_update_pengiriman():
+  if 'nomor_telepon' and 'status'in request.args:
+    nomor_telepon = str(request.args['nomor_telepon'])
+    status = str(request.args['status'])
+  else:
+    return jsonify(message="Please check the message.",category="error",status=404)
+
+  if updateStatusPesan(nomor_telepon, status):
+    return jsonify(message="Message Status Berhasil diupdate.",category="success",status=200)
+  else:
+    jsonify(message="Message Status Gagal diupdate.",category="error",status=404)
 
 app.run(host='0.0.0.0')

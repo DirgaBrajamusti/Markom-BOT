@@ -2,6 +2,7 @@ from flask import jsonify
 import requests
 from config.redisdata import *
 from config.database import *
+import re
 
 def sendAttachment(filePath,caption):
   return jsonify({"type": "attachment","data": filePath, "caption" : caption})
@@ -18,3 +19,16 @@ def waKirimPesan(nomor_telepon, message):
 def waKirimSurat(nomor_telepon, file):
     url = f"http://localhost:5002/api/v1/sendsurat/{nomor_telepon}/file/{file}"
     r = requests.get(url)
+
+def dataPercent(part, whole):
+  x = 100 * float(part)/float(whole)
+  return "{:.1f}".format(x)
+
+def cek_nomor_telepon(value):
+    rule = re.compile(r'^(?:\+?62)?[06]\d{9,13}$')
+    if not rule.search(value):
+        print("nomor salah")
+        return False
+    else:
+        print("nomor benar")
+        return True

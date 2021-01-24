@@ -54,6 +54,27 @@ def lihatDataPMB():
     else:
         dbCursor.close()
         return hasil
+    
+def cekTerkirimDataPMB(status):
+    dbCursor = db.cursor(dictionary=True)
+    dbCursor.execute(f"SELECT * FROM pmb WHERE status = '{status}'")
+    hasil = dbCursor.fetchall()
+    if not hasil:
+        dbCursor.close()
+        return False
+    else:
+        dbCursor.close()
+        return hasil
+def cekDataSudahAda(nama):
+    dbCursor = db.cursor(dictionary=True)
+    dbCursor.execute(f'SELECT * FROM pmb WHERE nama = "{str(nama)}"')
+    hasil = dbCursor.fetchall()
+    if not hasil:
+        dbCursor.close()
+        return False
+    else:
+        dbCursor.close()
+        return True
 
 def updateStatusPesan(nomor_telepon, status):
     dbCursor = db.cursor(dictionary=True)

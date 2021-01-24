@@ -107,9 +107,7 @@
                     </form>
 
                     <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-
-                                               
+                    <ul class="navbar-nav ml-auto">                  
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
@@ -149,7 +147,54 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-primary" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">Data Pengiriman Pesan</h1>
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Data Pengiriman</h6>
+                        </div>
+                        <div class="card-body">
+                            <h4 class="small font-weight-bold">Belum Dikirim <span
+                                    class="float-right">{{data[0]}}%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: {{data[0]}}%"
+                                    aria-valuenow="{{data[0]}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Pending<span
+                                    class="float-right">{{data[1]}}%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{data[1]}}%"
+                                    aria-valuenow="{{data[1]}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Sudah Dikirim<span
+                                    class="float-right">{{data[2]}}%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar" role="progressbar" style="width: {{data[2]}}%"
+                                    aria-valuenow="{{data[2]}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Sudah Dibaca <span
+                                    class="float-right">{{data[3]}}%</span></h4>
+                            <div class="progress mb-4">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{data[3]}}%"
+                                    aria-valuenow="{{data[3]}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <h4 class="small font-weight-bold">Respon<span
+                                    class="float-right">Complete!</span></h4>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"
+                                    aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Upload Data Penerima Surat Undangan</h1>
 
@@ -158,7 +203,7 @@
                             <h6 class="m-0 font-weight-bold text-primary">Upload Data Penerima Surat Undangan</h6>
                         </div>
                         <div class="card-body">
-                            <form action = "http://localhost:5000/uploader" method = "POST" 
+                            <form action = "/" method = "POST" 
                                 enctype = "multipart/form-data">
                                 <input type = "file"  name = "file" />
                                 <button type="submit" class="btn btn-primary btn-icon-split">

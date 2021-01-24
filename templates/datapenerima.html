@@ -22,6 +22,8 @@
 
     <!-- Custom styles for this page -->
     <link href="https://startbootstrap.github.io/startbootstrap-sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css" rel="stylesheet">
+    
 
 </head>
 
@@ -182,6 +184,7 @@
                                         </tr>
                                     </tfoot>
                                     <tbody>
+                                        {% if data%}
                                         {% for result in data %}
                                         <tr>
                                             <th><input type="checkbox" value="{{result['id']}}" name="pilihan"></th>
@@ -192,6 +195,7 @@
                                             <td>{{result['status']}}</td>
                                         </tr>
                                         {% endfor %}
+                                        {% endif %}
                                     </tbody>
                                 </table>
                                 <button type="submit" class="btn btn-primary btn-icon-split">
@@ -246,11 +250,17 @@
     <!-- Page level plugins -->
     <script src="https://startbootstrap.github.io/startbootstrap-sb-admin-2/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="https://startbootstrap.github.io/startbootstrap-sb-admin-2/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
 
     <!-- Page level custom scripts -->
     <script type="text/javascript">
     $(document).ready(function() {
-      $('#dataTable').DataTable();
+      $('#dataTable').DataTable({
+          dom: 'Bfrtip',
+          buttons: [
+              'copy', 'excel', 'pdf'
+            ]
+        });
     });
     </script>
 

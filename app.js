@@ -83,12 +83,30 @@ client.on('message_ack', (message, ack)=>{
     if(ack == 1){
         console.log(message.id._serialized +": Server Send");
         rd.set("msg:"+ message.to.slice(0, -5), "Pending");
+        bot_api = 'http://127.0.0.1:5000/api/v1/update_pengiriman?nomor_telepon=' + message.to.slice(0, -5) + '&' + 'status=Pending';
+        fetch(bot_api).then(res => {
+            if (res.resultCode == "200") return res.json();
+            return Promise.reject(`Bad call: ${res.resultCode}`);
+        })
+        .then(console.log);
     }else if(ack == 2){
         console.log(message.id._serialized +": Message Received");
         rd.set("msg:"+message.to.slice(0, -5), "Terkirim");
+        bot_api = 'http://127.0.0.1:5000/api/v1/update_pengiriman?nomor_telepon=' + message.to.slice(0, -5) + '&' + 'status=Terkirim';
+        fetch(bot_api).then(res => {
+            if (res.resultCode == "200") return res.json();
+            return Promise.reject(`Bad call: ${res.resultCode}`);
+        })
+        .then(console.log);
     }else if(ack == 3){
         console.log(message.id._serialized +": Message Readed");
         rd.set("msg:"+message.to.slice(0, -5), "Sudah Dibaca");
+        bot_api = 'http://127.0.0.1:5000/api/v1/update_pengiriman?nomor_telepon=' + message.to.slice(0, -5) + '&' + 'status=Sudah Dibaca';
+        fetch(bot_api).then(res => {
+            if (res.resultCode == "200") return res.json();
+            return Promise.reject(`Bad call: ${res.resultCode}`);
+        })
+        .then(console.log);
     }
 });
 
