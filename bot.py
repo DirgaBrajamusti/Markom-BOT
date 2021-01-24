@@ -33,7 +33,7 @@ app.config["DEBUG"] = True
 app.config['SECRET_KEY'] = "rahasia"
 
 @app.route('/', methods=['GET', 'POST'])
-def home():
+def web_home():
   if request.method == 'POST':
       f = request.files['file']
       uid = uuid.uuid4()
@@ -47,8 +47,34 @@ def home():
       return redirect(url_for('home'))
   return render_template('index.html', data = pmb.persenanDataPesan())
 
+@app.route('/anak', methods=['GET', 'POST'])
+def home_anak():
+  if request.method == 'POST':
+    keyword = request.form["keyword"]
+    respond = request.form["respond"]
+    if checkKeywordChatbot(keyword):
+      flash("Keyword tersebut sudah ada")
+    else:
+      tambahKeywordChatbot(keyword, respond)
+      flash(f'Keyword "{keyword}"" sudah berhasil ditambah')
+    return render_template('anak.html')
+  return render_template('anak.html')
+
+@app.route('/tambah_keyword', methods=['GET', 'POST'])
+def web_tambah_keyword():
+  if request.method == 'POST':
+    keyword = request.form["keyword"]
+    respond = request.form["respond"]
+    if checkKeywordChatbot(keyword):
+      flash("Keyword tersebut sudah ada")
+    else:
+      tambahKeywordChatbot(keyword, respond)
+      flash(f'Keyword "{keyword}"" sudah berhasil ditambah')
+    return render_template('anak.html')
+  return render_template('anak.html')
+
 @app.route('/datapenerima', methods=['GET', 'POST'])
-def datapenerima():
+def web_datapenerima():
     data = lihatDataPMB()
     if not data:
       data = 0
@@ -72,14 +98,13 @@ def testdatapenerima():
 
 @app.route('/api/v1/message', methods=['GET'])
 def api_message_request():
-  if 'message_from' and 'message_name' and 'message_body' and 'attachment' in request.args:
+  if 'message_from' and 'message_name' and 'message_body' in request.args:
     message_from = str(request.args['message_from'])
     message_name = str(request.args['message_name'])
     message_body = str(request.args['message_body'])
-    attachment = str(request.args['attachment'])
   else:
     return jsonify(message="Please check the message.",category="error",status=404)
-  return pmb.checkMessage(message_from, message_body.lower(), attachment)
+  return pmb.checkMessage(message_from, message_body.lower())
 @app.route('/api/v1/update_pengiriman', methods=['GET'])
 def api_update_pengiriman():
   if 'nomor_telepon' and 'status'in request.args:

@@ -83,17 +83,21 @@ def generateSuratUndangan(nama, asal_sekolah):
     return True
 
 
-def checkMessage(message_from, message_body, attachment):
+def checkMessage(message_from, message_body):
+    check = checkKeywordChatbot(message_body)
     if message_body == "data_jalur_undangan.xlsx":
         inserted_data = masukinDataPMB(message_from, message_body)
         return sendMessage(f"Data telah dimasukkan sebanyak: {inserted_data}")
-    if message_body == "kirim semua undangan":
+    elif message_body == "kirim semua undangan":
         data = lihatDataPMB()
         for orang in data:
             if generateSuratUndangan(orang["nama"], orang["asal_sekolah"]):
                 waKirimPesan(orang["nomor_telepon"], "Halo Sobat Kampus Orange!\n\nBerdasarkan Rekomendasi dari Pihak Sekolah yaitu Guru BK,  kami dari Panita Penerimaan Mahasiswa Baru Poltekpos-Stimlog dengan ini kami menginformasikan bahwa saudara%2Fi dinyatakan lulus di kampus kami melalui Jalur Undangan. Berikut kami lampirkan surat undangan")
                 waKirimSurat(orang["nomor_telepon"], f"Surat Undangan {orang['nama']}.pdf")
-        return sendMessage("Undangan akan segera dikirim")                      
+        return sendMessage("Undangan akan segera dikirim") 
+    elif check:
+        return sendMessage(check)
+
     else:
         return sendMessage("Kata kunci masih belum dikenali")
 
