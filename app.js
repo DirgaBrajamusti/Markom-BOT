@@ -9,6 +9,7 @@ var app = express();
 var mime = require('mime-types')
 var redis = require('redis'),
 rd = redis.createClient();
+var mysql = require('mysql');
 
 // Redis Connection
 rd.on('error', function(err){
@@ -17,6 +18,38 @@ rd.on('error', function(err){
 rd.on('ready', function(){
     console.log('// Redis Ready');
 });
+
+// MySQL Connection
+var db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "pmbbot"
+});
+db.connect(function(err) {
+    if (err) throw err;
+    console.log("MySQL Connected!");
+});
+
+function updateStatusPesan(nomor_telepon, status){
+    var sql = `UPDATE pmb SET status = '${status}' WHERE nomor_telepon = '${nomor_telepon}'`;
+    db.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log(`${nomor_telepon}: ${status}`);
+    });
+}
+
+function checkKeywordChatbot(message_body){
+    let rawdata = fs.readFileSync('commands/keywords.json');
+    let json = JSON.parse(rawdata);
+
+    if(json[message_body.toLowerCase()] == undefined){
+        return false
+    }else{
+        return json[message_body.toLowerCase()]
+    }
+
+}
 
 // Path where the session data will be stored
 const SESSION_FILE_PATH = './config/session.json';
@@ -81,32 +114,14 @@ app.get('/api/v1/sendsurat/:phone_number/file/:file', async function(req, res) {
 var terkirim = [];
 client.on('message_ack', (message, ack)=>{
     if(ack == 1){
-        console.log(message.id._serialized +": Server Send");
         rd.set("msg:"+ message.to.slice(0, -5), "Pending");
-        bot_api = 'http://127.0.0.1:5000/api/v1/update_pengiriman?nomor_telepon=' + message.to.slice(0, -5) + '&' + 'status=Pending';
-        fetch(bot_api).then(res => {
-            if (res.resultCode == "200") return res.json();
-            return Promise.reject(`Bad call: ${res.resultCode}`);
-        })
-        .then(console.log);
+        updateStatusPesan(message.to.slice(0, -5), "Pending")
     }else if(ack == 2){
-        console.log(message.id._serialized +": Message Received");
         rd.set("msg:"+message.to.slice(0, -5), "Terkirim");
-        bot_api = 'http://127.0.0.1:5000/api/v1/update_pengiriman?nomor_telepon=' + message.to.slice(0, -5) + '&' + 'status=Terkirim';
-        fetch(bot_api).then(res => {
-            if (res.resultCode == "200") return res.json();
-            return Promise.reject(`Bad call: ${res.resultCode}`);
-        })
-        .then(console.log);
+        updateStatusPesan(message.to.slice(0, -5), "Terkirim")
     }else if(ack == 3){
-        console.log(message.id._serialized +": Message Readed");
         rd.set("msg:"+message.to.slice(0, -5), "Sudah Dibaca");
-        bot_api = 'http://127.0.0.1:5000/api/v1/update_pengiriman?nomor_telepon=' + message.to.slice(0, -5) + '&' + 'status=Sudah Dibaca';
-        fetch(bot_api).then(res => {
-            if (res.resultCode == "200") return res.json();
-            return Promise.reject(`Bad call: ${res.resultCode}`);
-        })
-        .then(console.log);
+        updateStatusPesan(message.to.slice(0, -5), "Sudah Dibaca")
     }
 });
 
@@ -115,49 +130,55 @@ app.get('/api/v1/cekterkirim', async function(req, res) {
 });
 
 client.on('message', async message => {
+    rd.set("logs:"+ message.id._serialized, message.body);
     if(message.isStatus == false){
-        // Untuk yang berfile
-        if (message.hasMedia == true) {
-            const attachmentData = await message.downloadMedia();
-            let file = new Buffer.from(attachmentData.data,'base64');
-            let ext = mime.extension(attachmentData.mimetype);
-            fs.writeFileSync('assets/userfile/' + message.from.slice(0, -5) + message.body, file);
-            console.log(message.from + " send: " + attachmentData.mimetype);
-            const contact = await message.getContact();
-            console.log(message.from + " send: " + message.body + attachmentData.mimetype);
-            bot_api = 'http://127.0.0.1:5000/api/v1/message?message_from=' + message.from.slice(0, -5) + '&' + 'message_name=' + contact.pushname + '&' + 'message_body=' + message.body + '&' + 'attachment=true';
-            fetch(bot_api).then(response => response.json()).then(json => {
-                if (json['type'] == "message"){
-                    client.sendMessage(message.from, json['data']);
-                    console.log("Pesan Terkirim: " + json['data']);
-                }else{
-                    const attachment = MessageMedia.fromFilePath(json['data'])
-                    client.sendMessage(message.from, attachment, {caption: json['caption']});
-                    console.log("Attachment Terkirim")
-                }
-            });
-        // Untuk yang tidak berfile
-        }else{
-            const contact = await message.getContact();
-            console.log(message.from + " send: " + message.body + "| Message ID: " + message.id);
-            bot_api = 'http://127.0.0.1:5000/api/v1/message?message_from=' + message.from.slice(0, -5) + '&' + 'message_name=' + contact.pushname + '&' + 'message_body=' + message.body + '&' + 'attachment=false';
-            fetch(bot_api).then(response => response.json())
-            .then(json => {
-                if (json['type'] == "message"){
-                    client.sendMessage(message.from, json['data']);
-                    console.log("Pesan Terkirim: " + json['data']);
-                }else{
-                    if (json['data'].slice(-3) == "mp3"){
-                        const mp3 = MessageMedia.fromFilePath(json['data'])
-                        client.sendMessage(message.from, mp3, {sendAudioAsVoice: true});
-                        console.log("Voice Note Terkirim")
+        const cek = checkKeywordChatbot(message.body)
+        if(cek == false){
+            // Untuk yang berfile
+            if (message.hasMedia == true) {
+                const attachmentData = await message.downloadMedia();
+                let file = new Buffer.from(attachmentData.data,'base64');
+                let ext = mime.extension(attachmentData.mimetype);
+                fs.writeFileSync('assets/userfile/' + message.from.slice(0, -5) + message.body, file);
+                console.log(message.from + " send: " + attachmentData.mimetype);
+                const contact = await message.getContact();
+                console.log(message.from + " send: " + message.body + attachmentData.mimetype);
+                bot_api = 'http://127.0.0.1:5000/api/v1/message?message_from=' + message.from.slice(0, -5) + '&' + 'message_name=' + contact.pushname + '&' + 'message_body=' + message.body + '&' + 'attachment=true';
+                fetch(bot_api).then(response => response.json()).then(json => {
+                    if (json['type'] == "message"){
+                        client.sendMessage(message.from, json['data']);
+                        console.log("Pesan Terkirim: " + json['data']);
                     }else{
-                        const gambar = MessageMedia.fromFilePath(json['data'])
-                        client.sendMessage(message.from, gambar, {caption: json['caption']});
-                        console.log("File Terkirim")
+                        const attachment = MessageMedia.fromFilePath(json['data'])
+                        client.sendMessage(message.from, attachment, {caption: json['caption']});
+                        console.log("Attachment Terkirim")
                     }
-                }
-            });
+                });
+            // Untuk yang tidak berfile
+            }else{
+                const contact = await message.getContact();
+                console.log(message.from + " send: " + message.body + "| Message ID: " + message.id);
+                bot_api = 'http://127.0.0.1:5000/api/v1/message?message_from=' + message.from.slice(0, -5) + '&' + 'message_name=' + contact.pushname + '&' + 'message_body=' + message.body + '&' + 'attachment=false';
+                fetch(bot_api).then(response => response.json())
+                .then(json => {
+                    if (json['type'] == "message"){
+                        client.sendMessage(message.from, json['data']);
+                        console.log("Pesan Terkirim: " + json['data']);
+                    }else{
+                        if (json['data'].slice(-3) == "mp3"){
+                            const mp3 = MessageMedia.fromFilePath(json['data'])
+                            client.sendMessage(message.from, mp3, {sendAudioAsVoice: true});
+                            console.log("Voice Note Terkirim")
+                        }else{
+                            const gambar = MessageMedia.fromFilePath(json['data'])
+                            client.sendMessage(message.from, gambar, {caption: json['caption']});
+                            console.log("File Terkirim")
+                        }
+                    }
+                });
+            }
+        }else{
+            client.sendMessage(message.from, cek);
         }
     }
 });

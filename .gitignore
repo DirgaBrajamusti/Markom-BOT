@@ -104,5 +104,6 @@ dist
 .tern-port
 
 # Whatsapp Session
-config/session.json
 assets/
+config/session.json
+redistest.js

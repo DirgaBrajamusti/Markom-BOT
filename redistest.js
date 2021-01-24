@@ -1,13 +1,32 @@
-var redis = require('redis'),
-rd = redis.createClient();
-
-rd.on('error', function(err){
-    console.log('Error ' + err);
+var mysql = require('mysql');
+var db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "pmbbot"
+});
+db.connect(function(err) {
+    if (err) throw err;
+    console.log("MySQL Connected!");
 });
 
-
-console.log('Connection is establishing now...');
-rd.get("user:123", redis.print);
-for(i=0; i < 10; i++){
-    rd.set("test:"+i, "Hello")
+function updateStatusPesan(nomor_telepon, status){
+    db.query(`SELECT status FROM pmb WHERE nomor_telepon = '${nomor_telepon}'`, function (err, result) {
+        if (err){
+            throw err
+        }else{
+            if(result[0].status == "Sudah Dibaca"){
+                db.query(`UPDATE pmb SET status = 'Direspon' WHERE nomor_telepon = '${nomor_telepon}'`, function (err, result) {
+                    if (err) throw err;
+                    console.log(`${nomor_telepon}: Sudah Direspon`);
+                  });
+            }else{
+                db.query(`UPDATE pmb SET status = '${status}' WHERE nomor_telepon = '${nomor_telepon}'`, function (err, result) {
+                    if (err) throw err;
+                    console.log(`${nomor_telepon}: ${status}`);
+                  });
+            }
+        }
+    });
 }
+updateStatusPesan("6281241668963", "Sudah Dibaca")
