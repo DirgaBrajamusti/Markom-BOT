@@ -1,24 +1,14 @@
 import flask
-from flask import request, jsonify, render_template, flash, redirect, url_for, redirect, session
+from flask import request, jsonify, render_template, flash, redirect, url_for, redirect, session, send_file, Markup
 import requests
 import atexit
 import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
 import os
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-
 print("System online: " + str(datetime.datetime.now()))
-def checkStatusPesan():
-  print("Check Status Pesan")
-  for data in lihatDataPMB():
-    updateStatusPesan(data["nomor_telepon"], getStatusPengiriman(data["nomor_telepon"]))
-
-scheduler = BackgroundScheduler()
-#scheduler.add_job(checkStatusPesan, 'cron', minute='*/1')
-scheduler.start()
 
 # Config
 from config.database import *
@@ -62,25 +52,15 @@ def web_home():
         flash(f"{hasil[0]} telah dimasukkan")
       else:
         flash(f"{hasil[0]} telah dimasukkan")
-        flash(f"Tolong cek file ini{hasil[1]}")
-      return redirect(url_for('home'))
+        flash(Markup(f'Tolong cek data pada file ini: <a href="/downloads/{hasil[1]}">Klik disini untuk mendownload file</a>'))
+      return redirect(url_for('web_home'))
     return render_template('index.html', data = pmb.persenanDataPesan(), user = user)
   else:
       return redirect(url_for("login"))
 
-
-@app.route('/anak', methods=['GET', 'POST'])
-def home_anak():
-  if request.method == 'POST':
-    keyword = request.form["keyword"]
-    respond = request.form["respond"]
-    if checkKeywordChatbot(keyword):
-      flash("Keyword tersebut sudah ada")
-    else:
-      tambahKeywordChatbot(keyword, respond)
-      flash(f'Keyword "{keyword}"" sudah berhasil ditambah')
-    return render_template('anak.html')
-  return render_template('anak.html')
+@app.route('/downloads/<path:filename>', methods=['GET', 'POST'])
+def download(filename):
+    return send_file(f'assets\\temp\\{filename}.xlsx', as_attachment=True)
 
 @app.route('/tambah_keyword', methods=['GET', 'POST'])
 def web_tambah_keyword():
@@ -93,7 +73,7 @@ def web_tambah_keyword():
         flash("Keyword tersebut sudah ada")
       else:
         tambahKeywordChatbot(keyword, respond)
-        flash(f'Keyword "{keyword}"" sudah berhasil ditambah')
+        flash(f'Keyword "{keyword}" sudah berhasil ditambah')
       return render_template('tambah_keyword.html', user = user)
     return render_template('tambah_keyword.html', user = user)
   else:
@@ -110,7 +90,7 @@ def web_datapenerima():
         for pil in request.form.getlist('pilihan'):
             orang = cariDataPMB(pil)[0]
             if pmb.generateSuratUndangan(orang["nama"], orang["asal_sekolah"]):
-                waKirimPesan(orang["nomor_telepon"], "Halo Sobat Kampus Orange!\n\nBerdasarkan Rekomendasi dari Pihak Sekolah yaitu Guru BK,  kami dari Panita Penerimaan Mahasiswa Baru Poltekpos-Stimlog dengan ini kami menginformasikan bahwa saudara%2Fi dinyatakan lulus di kampus kami melalui Jalur Undangan. Berikut kami lampirkan surat undangan")
+                waKirimPesan(orang["nomor_telepon"], f"Halo Sobat Kampus Orange!\n{orang['nama']}\n\nBerdasarkan Rekomendasi dari Pihak Sekolah yaitu Guru BK,  kami dari Panita Penerimaan Mahasiswa Baru Poltekpos-Stimlog dengan ini kami menginformasikan bahwa saudara%2Fi dinyatakan lulus di kampus kami melalui Jalur Undangan. Berikut kami lampirkan surat undangan")
                 waKirimSurat(orang["nomor_telepon"], f"Surat Undangan {orang['nama']}.pdf")
         return "Done"
     return render_template('datapenerima.html', data = data, user = user)

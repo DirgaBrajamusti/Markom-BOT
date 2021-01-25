@@ -37,7 +37,7 @@ def masukinDataPMB(message_from, message_body):
                     inserted_data += 1
     if tmp_nama:
         uid = uuid.uuid4()
-        pd.DataFrame({'First Name' : tmp_nama, "Company":tmp_sma, "Mobile Phone": tmp_nomor, "Email Address":tmp_email}).to_excel(f'assets\\userfile\\{uid}.xlsx')
+        pd.DataFrame({'First Name' : tmp_nama, "Company":tmp_sma, "Mobile Phone": tmp_nomor, "Email Address":tmp_email}).to_excel(f'assets\\temp\\{uid}.xlsx')
     else:
         uid = None
     return inserted_data, uid
