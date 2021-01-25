@@ -89,13 +89,19 @@ def web_datapenerima():
     if request.method == 'POST':
         for pil in request.form.getlist('pilihan'):
             orang = cariDataPMB(pil)[0]
-            if pmb.generateSuratUndangan(orang["nama"], orang["asal_sekolah"]):
-                waKirimPesan(orang["nomor_telepon"], f"Halo Sobat Kampus Orange!\n{orang['nama']}\n\nBerdasarkan Rekomendasi dari Pihak Sekolah yaitu Guru BK,  kami dari Panita Penerimaan Mahasiswa Baru Poltekpos-Stimlog dengan ini kami menginformasikan bahwa saudara%2Fi dinyatakan lulus di kampus kami melalui Jalur Undangan. Berikut kami lampirkan surat undangan")
-                waKirimSurat(orang["nomor_telepon"], f"Surat Undangan {orang['nama']}.pdf")
+            pmb.kirimUndangan(orang["nama"], orang["asal_sekolah"],orang["nomor_telepon"])
         return "Done"
     return render_template('datapenerima.html', data = data, user = user)
   else:
     return redirect(url_for("login"))
+@app.route('/api/v1/kirimsemua', methods=['GET', 'POST'])
+def api_kirimsemua():
+  if request.method == 'POST':
+    for data in cariDataPMBTahun(request.form.get('tahun')):
+      pmb.kirimUndangan(data["nama"], data["asal_sekolah"], data["nomor_telepon"])
+    flash(f"Pesan akan dikirimkan yang tahun {request.form.get('tahun')}")
+  return redirect(url_for("web_home"))
+
 
 @app.route('/api/v1/message', methods=['GET'])
 def api_message_request():

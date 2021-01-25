@@ -122,6 +122,16 @@ def cariDataPMB(id):
     else:
         dbCursor.close()
         return hasil
+def cariDataPMBTahun(tahun):
+    dbCursor = db.cursor(dictionary=True)
+    dbCursor.execute(f"SELECT * FROM pmb WHERE tahun = {tahun}")
+    hasil = dbCursor.fetchall()
+    if not hasil:
+        dbCursor.close()
+        return False
+    else:
+        dbCursor.close()
+        return hasil
 
 def checkUser(phone_number):
     dbCursor = db.cursor(dictionary=True)

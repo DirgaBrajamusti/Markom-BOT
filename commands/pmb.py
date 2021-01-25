@@ -81,6 +81,14 @@ def generateSuratUndangan(nama, asal_sekolah):
     output.write(outputStream)
     outputStream.close()
     return True
+    
+def kirimUndangan(nama, asal_sekolah, nomor_telepon):
+    if generateSuratUndangan(nama, asal_sekolah):
+        waKirimPesan(nomor_telepon, f"Halo Sobat Kampus Orange!\n{nama}\n\nBerdasarkan Rekomendasi dari Pihak Sekolah yaitu Guru BK,  kami dari Panita Penerimaan Mahasiswa Baru Poltekpos-Stimlog dengan ini kami menginformasikan bahwa saudara%2Fi dinyatakan lulus di kampus kami melalui Jalur Undangan. Berikut kami lampirkan surat undangan")
+        waKirimSurat(nomor_telepon, f"Surat Undangan {nama}.pdf")
+        return True
+    else:
+        return False
 
 
 def checkMessage(message_from, message_body):

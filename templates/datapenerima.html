@@ -21,6 +21,7 @@
                         <th>Asal Sekolah</th>
                         <th>Nomor Telepon</th>
                         <th>Email</th>
+                        <th>Tahun</th>
                         <th>Status Pengiriman Pesan</th>
                     </tr>
                 </thead>
@@ -31,6 +32,7 @@
                         <th>Asal Sekolah</th>
                         <th>Nomor Telepon</th>
                         <th>Email</th>
+                        <th>Tahun</th>
                         <th>Status Pengiriman Pesan</th>
                     </tr>
                 </tfoot>
@@ -43,6 +45,7 @@
                         <td>{{result['asal_sekolah']}}</td>
                         <td>{{result['nomor_telepon']}}</td>
                         <td>{{result['email']}}</td>
+                        <td>{{result['tahun']}}</td>
                         <td>{{result['status']}}</td>
                     </tr>
                     {% endfor %}
@@ -55,6 +58,12 @@
                 </span>
                 <span class="text">Kirim Broadcast</span>
             </button>
+            <a href="#" class="btn btn-secondary btn-icon-split" data-toggle="modal" data-target="#kirimModal">
+                <span class="icon text-white-50">
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+                <span class="text">Kirim Semua</span>
+            </a>
         </div>
         </form>
     </div>
@@ -63,6 +72,35 @@
 
 {% endblock %}
 {% block end %}
+<!-- Kirim Modal-->
+<div class="modal fade" id="kirimModal" tabindex="-1" role="dialog" aria-labelledby="kirimModalLabel"
+aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="kirimModalLabel">Silahkan pilih tahun yang akan dikirim</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form action="/api/v1/kirimsemua" method="POST">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Pilih tahun:</label>
+                <select class="form-control" name="tahun">
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Kirim</button>
+        </div>
+        </form>
+    </div>
+</div>
+</div>
 <script type="text/javascript">
     $(document).ready(function() {
       $('#dataTable').DataTable({

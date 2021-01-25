@@ -28,7 +28,7 @@ var db = mysql.createConnection({
 });
 db.connect(function(err) {
     if (err) throw err;
-    console.log("MySQL Connected!");
+    console.log("// MySQL Connected!");
 });
 
 function updateStatusPesan(nomor_telepon, status){
