@@ -17,6 +17,16 @@ def nomorAdmin():
         return False
     else:
         return hasil
+        
+def getLoginData(email):
+    dbCursor = db.cursor(dictionary=True)
+    dbCursor.execute(f"SELECT nama, email, password from users WHERE email='{email}'")
+    hasil = dbCursor.fetchone()
+    if not hasil:
+        dbCursor.close()
+        return False
+    else:
+        return hasil
 
 def logs(message_name, message_from, keterangan):
     dbCursor = db.cursor(dictionary=True)
@@ -65,6 +75,7 @@ def cekTerkirimDataPMB(status):
     else:
         dbCursor.close()
         return hasil
+
 def cekDataSudahAda(nama):
     dbCursor = db.cursor(dictionary=True)
     dbCursor.execute(f'SELECT * FROM pmb WHERE nama = "{str(nama)}"')

@@ -1,11 +1,12 @@
 import flask
-from flask import request, jsonify, render_template, flash, redirect, url_for
+from flask import request, jsonify, render_template, flash, redirect, url_for, redirect, session
 import requests
 import atexit
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import os
 import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 
@@ -32,9 +33,27 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 app.config['SECRET_KEY'] = "rahasia"
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == "POST":
+        loginData = getLoginData(request.form["username"])
+        password = request.form["password"]
+        if loginData and check_password_hash(loginData["password"], password):
+            session["user"] = loginData["nama"]
+            return redirect(url_for("web_home"))
+        else:
+            flash("Email atau User Salah!")
+    return render_template('login.html')
+@app.route('/logout')
+def logout():
+    session.pop("user", None)
+    return redirect(url_for("login"))
+
 @app.route('/', methods=['GET', 'POST'])
 def web_home():
-  if request.method == 'POST':
+  if "user" in session:
+    user = session["user"]
+    if request.method == 'POST':
       f = request.files['file']
       uid = uuid.uuid4()
       f.save(f"assets\\userfile\\{uid}{f.filename}")
@@ -45,7 +64,10 @@ def web_home():
         flash(f"{hasil[0]} telah dimasukkan")
         flash(f"Tolong cek file ini{hasil[1]}")
       return redirect(url_for('home'))
-  return render_template('index.html', data = pmb.persenanDataPesan())
+    return render_template('index.html', data = pmb.persenanDataPesan(), user = user)
+  else:
+      return redirect(url_for("login"))
+
 
 @app.route('/anak', methods=['GET', 'POST'])
 def home_anak():
@@ -62,19 +84,25 @@ def home_anak():
 
 @app.route('/tambah_keyword', methods=['GET', 'POST'])
 def web_tambah_keyword():
-  if request.method == 'POST':
-    keyword = request.form["keyword"]
-    respond = request.form["respond"]
-    if checkKeywordChatbot(keyword):
-      flash("Keyword tersebut sudah ada")
-    else:
-      tambahKeywordChatbot(keyword, respond)
-      flash(f'Keyword "{keyword}"" sudah berhasil ditambah')
-    return render_template('anak.html')
-  return render_template('anak.html')
+  if "user" in session:
+    user = session["user"]
+    if request.method == 'POST':
+      keyword = request.form["keyword"]
+      respond = request.form["respond"]
+      if checkKeywordChatbot(keyword):
+        flash("Keyword tersebut sudah ada")
+      else:
+        tambahKeywordChatbot(keyword, respond)
+        flash(f'Keyword "{keyword}"" sudah berhasil ditambah')
+      return render_template('tambah_keyword.html', user = user)
+    return render_template('tambah_keyword.html', user = user)
+  else:
+    return redirect(url_for("login"))
 
 @app.route('/datapenerima', methods=['GET', 'POST'])
 def web_datapenerima():
+  if "user" in session:
+    user = session["user"]
     data = lihatDataPMB()
     if not data:
       data = 0
@@ -85,16 +113,9 @@ def web_datapenerima():
                 waKirimPesan(orang["nomor_telepon"], "Halo Sobat Kampus Orange!\n\nBerdasarkan Rekomendasi dari Pihak Sekolah yaitu Guru BK,  kami dari Panita Penerimaan Mahasiswa Baru Poltekpos-Stimlog dengan ini kami menginformasikan bahwa saudara%2Fi dinyatakan lulus di kampus kami melalui Jalur Undangan. Berikut kami lampirkan surat undangan")
                 waKirimSurat(orang["nomor_telepon"], f"Surat Undangan {orang['nama']}.pdf")
         return "Done"
-    return render_template('datapenerima.html', data = data)
-
-@app.route('/test/datapenerima', methods=['GET', 'POST'])
-def testdatapenerima():
-    data = lihatDataPMB()
-    if request.method == 'POST':
-        for pil in request.form.getlist('pilihan'):
-            print(pil)
-        return "Done"
-    return render_template('testdatapenerima.html', datapmb = {'data': lihatListDataPMB()})
+    return render_template('datapenerima.html', data = data, user = user)
+  else:
+    return redirect(url_for("login"))
 
 @app.route('/api/v1/message', methods=['GET'])
 def api_message_request():

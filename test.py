@@ -12,4 +12,7 @@ import base64
 
 from commands.pmb import *
 import json
+from werkzeug.security import generate_password_hash, check_password_hash
+
+print(generate_password_hash("a"))
 
