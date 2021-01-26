@@ -124,7 +124,7 @@ def cariDataPMB(id):
         return hasil
 def cariDataPMBTahun(tahun):
     dbCursor = db.cursor(dictionary=True)
-    dbCursor.execute(f"SELECT * FROM pmb WHERE tahun = {tahun}")
+    dbCursor.execute(f"SELECT * FROM pmb WHERE tahun = {tahun} AND status = 'Belum Dikirim'")
     hasil = dbCursor.fetchall()
     if not hasil:
         dbCursor.close()
