@@ -54,7 +54,7 @@ def web_home():
         flash(f"{hasil[0]} telah dimasukkan")
         flash(Markup(f'Tolong cek data pada file ini: <a href="/downloads/{hasil[1]}">Klik disini untuk mendownload file</a>'))
       return redirect(url_for('web_home'))
-    return render_template('index.html', data = pmb.persenanDataPesan(), user = user)
+    return render_template('index.html', data = pmb.dataPesan(), user = user)
   else:
       return redirect(url_for("login"))
 

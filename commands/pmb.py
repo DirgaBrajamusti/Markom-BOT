@@ -43,7 +43,7 @@ def masukinDataPMB(message_from, message_body):
         uid = None
     return inserted_data, uid
     
-def persenanDataPesan():
+def dataPesan():
     data_semua = lihatDataPMB()
     if data_semua:
         belum_dibaca = 0
@@ -59,7 +59,7 @@ def persenanDataPesan():
                 terkirim += 1
             elif data["status"] == "Sudah Dibaca":
                 terbaca += 1
-        return [dataPercent(belum_dibaca, len(data_semua)), dataPercent(pending, len(data_semua)), dataPercent(terkirim, len(data_semua)), dataPercent(terbaca, len(data_semua))]
+        return [dataPercent(belum_dibaca, len(data_semua)), dataPercent(pending, len(data_semua)), dataPercent(terkirim, len(data_semua)), dataPercent(terbaca, len(data_semua)), belum_dibaca, pending, terkirim, terbaca, data_semua]
     else:
         return 0
 
