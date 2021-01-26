@@ -33,7 +33,7 @@ CREATE TABLE `pmb` (
   `nama` varchar(255) NOT NULL,
   `asal_sekolah` varchar(255) DEFAULT NULL,
   `nomor_telepon` varchar(16) NOT NULL,
-  `tahun` year(4) NOT NULL DEFAULT year(current_timestamp()),
+  `tahun` year(4) NOT NULL DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `jenis` varchar(10) DEFAULT 'Umum',
   `jalur` varchar(10) DEFAULT 'Undangan',
