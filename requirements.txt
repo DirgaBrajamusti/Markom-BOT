@@ -13,3 +13,4 @@ openpyxl
 redis
 PyPDF2
 reportlab
+pytest-cov
