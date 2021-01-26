@@ -38,7 +38,7 @@ def login():
 def logout():
     session.pop("user", None)
     return redirect(url_for("login"))
-
+#HOME
 @app.route('/', methods=['GET', 'POST'])
 def web_home():
   if "user" in session:
