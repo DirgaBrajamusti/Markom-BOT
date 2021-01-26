@@ -6,11 +6,11 @@ import re
 import json
 
 def sendAttachment(filePath,caption):
-  return jsonify({"type": "attachment","data": filePath, "caption" : caption})
+  return jsonify({"type": "attachment","data": filePath, "caption" : caption}), 200
 
 
 def sendMessage(isiMessage):
-  return jsonify({"type": "message","data": isiMessage})
+  return jsonify({"type": "message","data": isiMessage}), 200
 
 def waKirimPesan(nomor_telepon, message):
     setPengirimanPesan(nomor_telepon, message)
@@ -37,7 +37,10 @@ def checkKeywordChatbot(keyword):
     with open("commands\keywords.json", "r+") as file:
         for key, respond in json.load(file).items():
             if key == keyword.lower():
-                return respond
+                a = respond
+                break
+            a = False
+        return a
     
 def cek_nomor_telepon(value):
     rule = re.compile(r'^(?:\+?62)?[06]\d{9,13}$')

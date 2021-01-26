@@ -1,0 +1,15 @@
+sudo: enabled
+language: python
+services:
+  -mysql
+  -redis
+script: pytest --cov=bot
+before_script:
+  -echo "USE MYSQL;\n UPDATE user SET authentication_string=PASSWORD('password') WHERE user='root';\n FLUSH PRIVILEGES;\n" | mysql -u root
+
+install:
+  - pip install -r requirements.txt
+
+before_install:
+  - mysql -u root -e 'CREATE DATABASE pmbbot;'
+  - mysql -u root pmbbot < pmb.sql

@@ -1,11 +1,8 @@
 import flask
 from flask import request, jsonify, render_template, flash, redirect, url_for, redirect, session, send_file, Markup
-import requests
-import atexit
 import datetime
-import os
 import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 
 
 print("System online: " + str(datetime.datetime.now()))
@@ -33,7 +30,10 @@ def login():
             return redirect(url_for("web_home"))
         else:
             flash("Email atau User Salah!")
-    return render_template('login.html')
+            return render_template('login.html')
+    else:
+      return render_template('login.html')
+
 @app.route('/logout')
 def logout():
     session.pop("user", None)
@@ -54,7 +54,8 @@ def web_home():
         flash(f"{hasil[0]} telah dimasukkan")
         flash(Markup(f'Tolong cek data pada file ini: <a href="/downloads/{hasil[1]}">Klik disini untuk mendownload file</a>'))
       return redirect(url_for('web_home'))
-    return render_template('index.html', data = pmb.dataPesan(), user = user)
+    else:
+      return render_template('index.html', data = pmb.dataPesan(), user = user)
   else:
       return redirect(url_for("login"))
 
@@ -84,11 +85,14 @@ def web_tambah_keyword():
 def web_kirim_followup():
   if "user" in session:
     user = session["user"]
-    for data in cariDataPMBFollowup(request.form.get('tahun'),request.form.get('jenis'),request.form.get('jalur')):
-      waKirimPesan(data["nomor_telepon"], request.form.get('pesan'))
+    if request.method == "POST":
+      for data in cariDataPMBFollowup(request.form.get('tahun'),request.form.get('jenis'),request.form.get('jalur')):
+        waKirimPesan(data["nomor_telepon"], request.form.get('pesan'))
+      return render_template('kirim_followup.html', user = user)
     return render_template('kirim_followup.html', user = user)
   else:
     return redirect(url_for("login"))
+
 @app.route('/datapenerima', methods=['GET', 'POST'])
 def web_datapenerima():
   if "user" in session:
@@ -104,6 +108,7 @@ def web_datapenerima():
     return render_template('datapenerima.html', data = data, user = user)
   else:
     return redirect(url_for("login"))
+
 @app.route('/api/v1/kirimsemua', methods=['GET', 'POST'])
 def api_kirimsemua():
   if request.method == 'POST':
@@ -128,11 +133,12 @@ def api_update_pengiriman():
     nomor_telepon = str(request.args['nomor_telepon'])
     status = str(request.args['status'])
   else:
-    return jsonify(message="Please check the message.",category="error",status=404)
+    return jsonify(message="Please check the message.",category="error",status=404), 404
 
   if updateStatusPesan(nomor_telepon, status):
-    return jsonify(message="Message Status Berhasil diupdate.",category="success",status=200)
+    return jsonify(message="Message Status Berhasil diupdate.",category="success",status=200), 200
   else:
     jsonify(message="Message Status Gagal diupdate.",category="error",status=404)
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+  app.run(host='0.0.0.0')

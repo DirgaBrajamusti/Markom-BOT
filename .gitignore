@@ -108,3 +108,5 @@ assets/
 config/session.json
 redistest.js
 config/session.json
+
+htmlcov

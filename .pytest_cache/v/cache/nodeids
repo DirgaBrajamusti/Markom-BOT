@@ -1,0 +1,8 @@
+[
+  "test_sample.py::TestApli::test_00_login",
+  "test_sample.py::TestApli::test_00_logout",
+  "test_sample.py::TestApli::test_01_login",
+  "test_sample.py::TestApli::test_02_login",
+  "test_sample.py::TestApli::test_03_logout",
+  "test_sample.py::TestApli::test_04_indexHome"
+]

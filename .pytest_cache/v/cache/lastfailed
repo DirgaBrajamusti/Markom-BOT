@@ -1,0 +1,4 @@
+{
+  "test_sample.py::TestApli::test_00_logout": true,
+  "test_sample.py::TestApli::test_04_indexHome": true
+}
