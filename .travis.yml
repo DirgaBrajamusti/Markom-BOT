@@ -4,8 +4,8 @@ services:
   -mysql
   -redis
 script: pytest --cov=bot
-before_script:
-  -echo "USE MYSQL;\n UPDATE user SET authentication_string=PASSWORD('password') WHERE user='root';\n FLUSH PRIVILEGES;\n" | mysql -u root
+# before_script:
+#   -echo "USE mysql;\n UPDATE user SET authentication_string=PASSWORD('password') WHERE user='root';\n FLUSH PRIVILEGES;\n" | mysql -u root
 
 install:
   - pip install -r requirements.txt
