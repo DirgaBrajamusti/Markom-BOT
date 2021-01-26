@@ -22,6 +22,8 @@
                         <th>Nomor Telepon</th>
                         <th>Email</th>
                         <th>Tahun</th>
+                        <th>Jenis</th>
+                        <th>Jalur</th>
                         <th>Status Pengiriman Pesan</th>
                     </tr>
                 </thead>
@@ -33,6 +35,8 @@
                         <th>Nomor Telepon</th>
                         <th>Email</th>
                         <th>Tahun</th>
+                        <th>Jenis</th>
+                        <th>Jalur</th>
                         <th>Status Pengiriman Pesan</th>
                     </tr>
                 </tfoot>
@@ -46,6 +50,8 @@
                         <td>{{result['nomor_telepon']}}</td>
                         <td>{{result['email']}}</td>
                         <td>{{result['tahun']}}</td>
+                        <td>{{result['jenis']}}</td>
+                        <td>{{result['jalur']}}</td>
                         <td>{{result['status']}}</td>
                     </tr>
                     {% endfor %}
@@ -78,7 +84,7 @@ aria-hidden="true">
 <div class="modal-dialog" role="document">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="kirimModalLabel">Silahkan pilih tahun yang akan dikirim</h5>
+            <h5 class="modal-title" id="kirimModalLabel">Silahkan pilih yang akan dikirim</h5>
             <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span>
             </button>
@@ -86,7 +92,20 @@ aria-hidden="true">
         <div class="modal-body">
             <form action="/api/v1/kirimsemua" method="POST">
             <div class="form-group">
-                <label for="exampleFormControlSelect1">Pilih tahun:</label>
+                <label for="formPilihan">Pilih Jenis:</label>
+                <select class="form-control" name="jenis">
+                    <option value="Umum">Umum</option>
+                    <option value="Politeknik Pos Indonesia">Politeknik Pos Indonesia</option>
+                    <option value="Stimlog">Stimlog</option>
+                </select>
+                <label for="formPilihan">Pilih Jalur:</label>
+                <select class="form-control" name="jalur">
+                    <option value="Undangan">Undangan</option>
+                    <option value="Rapor">Rapor</option>
+                    <option value="Reguler">Reguler</option>
+                    <option value="Mandiri">Mandiri</option>
+                </select>
+                <label for="formPilihan">Pilih Tahun:</label>
                 <select class="form-control" name="tahun">
                   <option value="2021">2021</option>
                   <option value="2022">2022</option>

@@ -15,6 +15,4 @@ import json
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-print(cariDataPMBTahun("2021"))
-for data in :
-    print(data)
+print(lihatDataPMB())
