@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title%}Keyword Chatbot{% endblock%}
+{% block content %}
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-primary" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Tambah Keyword Chatbot</h6>
+    </div>
+    <div class="card-body">
+        <form action = "#" method = "POST">
+            <div class="mb-3">
+                <label class="form-label">Masukkan Pesan</label>
+                <textarea class="form-control" name="pesan" placeholder="Masukkan pesan disini" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="formPilihan">Pilih Jenis:</label>
+                <select class="form-control" name="jenis">
+                    <option value="Umum">Umum</option>
+                    <option value="Politeknik Pos Indonesia">Politeknik Pos Indonesia</option>
+                    <option value="Stimlog">Stimlog</option>
+                </select>
+                <label for="formPilihan">Pilih Jalur:</label>
+                <select class="form-control" name="jalur">
+                    <option value="Undangan">Undangan</option>
+                    <option value="Rapor">Rapor</option>
+                    <option value="Reguler">Reguler</option>
+                    <option value="Mandiri">Mandiri</option>
+                </select>
+                <label for="formPilihan">Pilih Tahun:</label>
+                <select class="form-control" name="tahun">
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-icon-split">
+                <span class="text">Kirim Pesan Follow-up</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

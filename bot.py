@@ -79,6 +79,16 @@ def web_tambah_keyword():
   else:
     return redirect(url_for("login"))
 
+
+@app.route('/kirimfollowup', methods=['GET', 'POST'])
+def web_kirim_followup():
+  if "user" in session:
+    user = session["user"]
+    for data in cariDataPMBFollowup(request.form.get('tahun'),request.form.get('jenis'),request.form.get('jalur')):
+      waKirimPesan(data["nomor_telepon"], request.form.get('pesan'))
+    return render_template('kirim_followup.html', user = user)
+  else:
+    return redirect(url_for("login"))
 @app.route('/datapenerima', methods=['GET', 'POST'])
 def web_datapenerima():
   if "user" in session:
@@ -97,7 +107,7 @@ def web_datapenerima():
 @app.route('/api/v1/kirimsemua', methods=['GET', 'POST'])
 def api_kirimsemua():
   if request.method == 'POST':
-    for data in cariDataPMBTahun(request.form.get('tahun')):
+    for data in cariDataPMBTahun(request.form.get('tahun'),request.form.get('jenis'),request.form.get('jalur')):
       pmb.kirimUndangan(data["nama"], data["asal_sekolah"], data["nomor_telepon"])
     flash(f"Pesan akan dikirimkan yang tahun {request.form.get('tahun')}")
   return redirect(url_for("web_home"))

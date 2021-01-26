@@ -10,38 +10,38 @@ import uuid
 
 
 def masukinDataPMB(message_from, message_body):
-    print(f"{message_from}{message_body}")
     data = pd.read_excel (f"assets\\userfile\\{message_from}{message_body}")
-    df = pd.DataFrame(data, columns= ['First Name','Company','Mobile Phone', 'Email Address'])
+    df = pd.DataFrame(data, columns= ['First Name','Company','Mobile Phone', 'Email Address','Jenis','Jalur'])
     df = df.replace({np.nan: None})
-    print(data)
     inserted_data = 0
     tmp_nama = []
     tmp_sma = []
     tmp_nomor = []
     tmp_email = []
+    tmp_jenis = []
+    tmp_jalur = []
     for data in df.values.tolist():
         if not cek_nomor_telepon(str(data[2])):
             tmp_nama.append(data[0])
             tmp_sma.append(data[1])
             tmp_nomor.append(data[2])
             tmp_email.append(data[3])
+            tmp_jalur.append(data[4])
+            tmp_jenis.append(data[5])
         else:
-            print(data[0])
             if cekDataSudahAda(data[0]):
                 pass
             else:
                 if str(data[2]).startswith("0"):
                     data[2] = "62" + str(data[2][1:])
-                if insertDataPMB(data[0], data[1], data[2], data[3]):
+                if insertDataPMB(data[0], data[1], data[2], data[3], data[4], data[5]):
                     inserted_data += 1
     if tmp_nama:
         uid = uuid.uuid4()
-        pd.DataFrame({'First Name' : tmp_nama, "Company":tmp_sma, "Mobile Phone": tmp_nomor, "Email Address":tmp_email}).to_excel(f'assets\\temp\\{uid}.xlsx')
+        pd.DataFrame({'First Name' : tmp_nama, "Company":tmp_sma, "Mobile Phone": tmp_nomor, "Email Address":tmp_email, "Jenis":tmp_jenis, "Jalur":tmp_jalur}).to_excel(f'assets\\temp\\{uid}.xlsx')
     else:
         uid = None
     return inserted_data, uid
-
     
 def persenanDataPesan():
     data_semua = lihatDataPMB()

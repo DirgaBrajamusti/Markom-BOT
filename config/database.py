@@ -42,10 +42,10 @@ def logs(message_name, message_from, keterangan):
         return False
 
         
-def insertDataPMB(nama, asal_sekolah, nomor_telepon, email):
+def insertDataPMB(nama, asal_sekolah, nomor_telepon, email, jenis, jalur):
     dbCursor = db.cursor(dictionary=True)
-    sql = "INSERT INTO pmb (id, nama, asal_sekolah, nomor_telepon, email) VALUES (0, %s ,%s, %s, %s)"
-    val = (nama, asal_sekolah, nomor_telepon, email)
+    sql = "INSERT INTO pmb (id, nama, asal_sekolah, nomor_telepon, email, jenis, jalur) VALUES (0, %s ,%s, %s, %s, %s, %s)"
+    val = (nama, asal_sekolah, nomor_telepon, email, jenis, jalur)
     dbCursor.execute(sql, val)
     try:
         db.commit()
@@ -122,9 +122,19 @@ def cariDataPMB(id):
     else:
         dbCursor.close()
         return hasil
-def cariDataPMBTahun(tahun):
+def cariDataPMBTahun(tahun,jenis,jalur):
     dbCursor = db.cursor(dictionary=True)
-    dbCursor.execute(f"SELECT * FROM pmb WHERE tahun = {tahun} AND status = 'Belum Dikirim'")
+    dbCursor.execute(f"SELECT * FROM pmb WHERE tahun = {tahun} AND status = 'Belum Dikirim' AND jenis = '{jenis}' AND jalur = '{jalur}'")
+    hasil = dbCursor.fetchall()
+    if not hasil:
+        dbCursor.close()
+        return False
+    else:
+        dbCursor.close()
+        return hasil
+def cariDataPMBFollowup(tahun,jenis,jalur):
+    dbCursor = db.cursor(dictionary=True)
+    dbCursor.execute(f"SELECT * FROM pmb WHERE tahun = {tahun} AND jenis = '{jenis}' AND jalur = '{jalur}'")
     hasil = dbCursor.fetchall()
     if not hasil:
         dbCursor.close()
